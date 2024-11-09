@@ -7,7 +7,6 @@ import path from"node:path";
 import{ observe, uptime }from"./stats.js";
 import{ getApiUrls, inviteResponse }from"./utils.js";
 import{ fileURLToPath }from"node:url";
-import {readFileSync} from "fs";
 import process from"node:process";
 
 const devmode = (process.env.NODE_ENV || "development") === "development";
@@ -20,34 +19,7 @@ interface Instance {
 }
 
 const app = express();
-
-type instace={
-	name:string,
-    description?:string,
-    descriptionLong?:string,
-    image?:string,
-    url?:string,
-    language:string,
-    country:string,
-    display:boolean,
-    urls?:{
-        wellknown:string,
-        api:string,
-        cdn:string,
-        gateway:string,
-        login?:string
-    },
-    contactInfo?:{
-        discord?:string,
-        github?:string,
-        email?:string,
-        spacebar?:string,
-        matrix?:string,
-        mastodon?:string
-    }
-}
-const instances=JSON.parse(readFileSync(process.env.JANK_INSTANCES_PATH||(__dirname+"/webpage/instances.json")).toString()) as instace[];
-
+import instances from"./webpage/instances.json" with { type: "json" };
 const instanceNames = new Map<string, Instance>();
 
 for(const instance of instances){
@@ -56,31 +28,7 @@ for(const instance of instances){
 
 app.use(compression());
 
-async function updateInstances(): Promise<void>{
-	try{
-		const response = await fetch("https://raw.githubusercontent.com/spacebarchat/spacebarchat/master/instances/instances.json");
-		const json = (await response.json()) as Instance[];
-		for(const instance of json){
-			if(instanceNames.has(instance.name)){
-				const existingInstance = instanceNames.get(instance.name);
-				if(existingInstance){
-					for(const key of Object.keys(instance)){
-						if(!existingInstance[key]){
-							existingInstance[key] = instance[key];
-						}
-					}
-				}
-			}else{
-				instances.push(instance as any);
-			}
-		}
-		observe(instances);
-	}catch(error){
-		console.error("Error updating instances:", error);
-	}
-}
-
-updateInstances();
+observe(instances);
 
 app.use("/getupdates", async (_req: Request, res: Response)=>{
 	try{
@@ -166,9 +114,7 @@ app.use("/", async (req: Request, res: Response)=>{
 	}
 });
 
-app.set('trust proxy', (ip:string) => ip.startsWith("127."));
-
-const PORT = process.env.PORT || Number(process.argv[2]) || 8080;
+const PORT = process.env.PORT || Number(process.argv[2]) || 80;
 app.listen(PORT, ()=>{
 	console.log(`Server running on port ${PORT}`);
 });
