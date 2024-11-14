@@ -224,10 +224,10 @@ textarea {
 	mask: url(/icons/copy.svg);
 }
 .svg-explore {
-	mask: url(/icons/explore.svg);
+	mask: url(/icons/explore.png);
 }
 .svg-home {
-	mask: url(/icons/home.svg);
+	mask: url(/icons/home.png);
 }
 .svg-settings {
 	mask: url(/icons/settings.svg);
@@ -236,7 +236,7 @@ textarea {
 	mask: url(/icons/voice.svg);
 }
 .svg-plus {
-	mask: url(/icons/plus.svg);
+	mask: url(/icons/plus.png);
 }
 .svg-x {
 	mask: url(/icons/x.svg);
